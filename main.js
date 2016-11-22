@@ -119,6 +119,17 @@ $scope.addQuestion=function(){
 		resultR:$scope.result,
 		resultC:$scope.checkedResultAnswer()
 	});
+	$scope.qid++;
+	$scope.reset();
+}
+
+$scope.reset=function(){
+	$scope.newQuestionShow=false;
+	$scope.question='';
+	$scope.answerType='radio';
+	$scope.resultType=true;
+	$scope.answerList=[];
+	$scope.result=null;
 
 }
 
