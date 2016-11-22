@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Quiz App</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.6/angular.min.js"></script>
+	<link rel="stylesheet" href="style.css">	
+	<script src="main.js"></script>
+</head>
+<body ng-app="quizApp">
+	<div class="container">
+		<div class="header">
+			<header>
+				<h2>Online Quiz</h2>
+			</header>
+		</div>
+		<div class="mainPage" ng-controller="controlQuiz">
+			<button type="button" ng-click="newQuestionShow=true">Create new Question</button><br>
+			<div class="new-question" ng-show="newQuestionShow">
+				<form name="newQues">
+					<h3>Create New Question</h3>
+					<p><label>QID: </label><input type="text" ng-model="qid" name="qid" size="4" ng-disabled="true"></p>
+					<label>Question:</label><br>
+					<textarea ng-model="question" rows="3" cols="70" placeholder="Type question here..." required></textarea><br>
+					<p><label>Answer Type:</label> <label><input type="radio" ng-model="answerType" name="answerType" value="radio" ng-click="selectAnswerType(answerType)">Single Punch</label>
+
+					<label><input type="radio" ng-model="answerType" name="answerType" value="checkbox" ng-click="selectAnswerType(answerType)">Multi Punch</label></p>
+
+					<div ng-hide="edit"><input type="text" ng-model="answer" name="answer" placeholder="Type answer here..." required>
+					<button type="button" ng-click="addAnswer()" ng-disabled="newQues.answer.$invalid">Add Answer</button></div>
+
+					<div ng-show="edit"><input type="text" ng-model="answer" name="answer" placeholder="Update answer here..." required>
+					<button type="button" ng-click="update()" ng-disabled="newQues.answer.$invalid">Update</button>
+					<button type="button" ng-click="edit=false;answer=''" >Cancel</button>
+					</div><br>
+					<div ng-show="errorAnsShow">{{errorSameAnswer}}</div><br>
+
+
+					<label ng-hide="answerList.length==0">Answer(s):</label><br>
+					<table class="tb-answer" border="1" ng-hide="answerList.length==0">
+						<tr>
+							<th>Ans ID</th>
+							<th>Answer</th>
+							<th>Editable?</th>
+							<th>Delete?</th>
+							<th>Result</th>
+						</tr>
+						<tr ng-repeat="ans in answerList">
+							<td>{{$index+1}}</td>
+							<td>{{ans.answer}}</td>
+							<td><button type="button" ng-click="editAns($index)">Edit</button></td>
+							<td><button  type="button" ng-disabled="edit" ng-click=deleteAns($index)>Delete</button></td>
+							<td ng-show="resultType"><input type="radio" ng-model="$parent.result" name="result" ng-value="{{$index+1}}" required></td>
+							<td ng-hide="resultType"><input type="checkbox" ng-model="ans.res" ></td>
+						</tr>
+					</table><br>
+			
+					<button type="button" ng-click="newQuestionShow=false">Cancel</button>
+					<button type="button" ng-click="addQuestion()">Create</button>
+					<p>{{result}}</p>
+					<p>{{checkedResultAnswer()}}</p>
+					<p>{{questionList|json}}</p>
+					
+					
+				</form>
+			</div>
+		</div>
+	
+</div>
+</body>
+</html>
