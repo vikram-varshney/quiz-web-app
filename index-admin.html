@@ -18,11 +18,11 @@
 		<div class="mainPage" ng-controller="controlQuiz">
 			<button type="button" ng-click="newQuestionShow=true">Create new Question</button><br>
 			<div class="new-question" ng-show="newQuestionShow">
-				<form name="newQues">
+				<form name="newQues" >
 					<h3>Create New Question</h3>
 					<p><label>QID: </label><input type="text" ng-model="qid" name="qid" size="4" ng-disabled="true"></p>
 					<label>Question:</label><br>
-					<textarea ng-model="question" rows="3" cols="70" placeholder="Type question here..." required></textarea><br>
+					<textarea ng-model="question" rows="3" cols="70" name="question" placeholder="Type question here..." required></textarea><br>
 					<p><label>Answer Type:</label> <label><input type="radio" ng-model="answerType" name="answerType" value="radio" ng-click="selectAnswerType(answerType)">Single Punch</label>
 
 					<label><input type="radio" ng-model="answerType" name="answerType" value="checkbox" ng-click="selectAnswerType(answerType)">Multi Punch</label></p>
@@ -52,19 +52,19 @@
 							<td><button type="button" ng-click="editAns($index)">Edit</button></td>
 							<td><button  type="button" ng-disabled="edit" ng-click=deleteAns($index)>Delete</button></td>
 							<td ng-show="resultType"><input type="radio" ng-model="$parent.result" name="result" ng-value="{{$index+1}}" required></td>
-							<td ng-hide="resultType"><input type="checkbox" ng-model="ans.res" ></td>
+							<td ng-hide="resultType"><input type="checkbox" name="result1" ng-model="ans.res"></td>
 						</tr>
 					</table><br>
 			
-					<button type="button" ng-click="newQuestionShow=false">Cancel</button>
-					<button type="button" ng-click="addQuestion()">Create</button>
-					<p>{{result}}</p>
-					<p>{{checkedResultAnswer()}}</p>
-					<p>{{questionList|json}}</p>
+					<button type="button" ng-click="reset()">Cancel</button>
+					<button type="button" ng-click="addQuestion()" ng-disabled="newQues.question.$invalid || answerList.length<2 || (newQues.result.$invalid && checkedResultAnswer()<1)">Create</button>
+					
 					
 					
 				</form>
+
 			</div>
+			<p>{{questionList|json}}</p>
 		</div>
 	
 </div>
