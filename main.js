@@ -133,4 +133,12 @@ $scope.reset=function(){
 
 }
 
+$scope.getResult=function(resultR,resultC){
+	if(resultR===null){
+		return resultC;
+	}else{
+		return resultR;
+	}
+}
+
 }]);
