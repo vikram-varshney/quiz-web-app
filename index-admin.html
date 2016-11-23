@@ -65,6 +65,30 @@
 
 			</div>
 			<p>{{questionList|json}}</p>
+			<table border="1" ng-hide="questionList.length==0">
+				<tr>
+					<th>QID</th>
+					<th>Question</th>
+					<th>Question Type</th>
+					<th>Answers</th>
+					<th>Result</th>
+					<th>Editable?</th>
+					<th>Delete?</th>
+				</tr>
+				<tr ng-repeat="qList in questionList">
+					<td>{{qList.qid}}</td>
+					<td>{{qList.question}}</td>
+					<td>{{qList.answerType}}</td>
+					<td>
+						<ul>
+							<li ng-repeat="ans in qList.answers">{{ans.answer}}</li>
+						</ul>
+					</td>
+					<td>{{getResult(qList.resultR,qList.resultC)}}</td>
+					<td></td>
+					<td></td>
+				</tr>
+			</table>
 		</div>
 	
 </div>
