@@ -5,6 +5,10 @@
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.6/angular.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+	<link rel="stylesheet" href="http://www.w3schools.com/lib/w3.css">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 	<link rel="stylesheet" href="style.css">	
 	<script src="main.js"></script>
 </head>
@@ -12,33 +16,37 @@
 	<div class="container">
 		<div class="header">
 			<header>
-				<h2>Online Quiz</h2>
+				<h2 class="oq-heading">Online Quiz</h2>
 			</header>
 		</div>
 		<div class="mainPage" ng-controller="controlQuiz">
-			<button type="button" ng-click="newQuestionShow=true">Create new Question</button><br>
+			<button class="bt-create-ques" type="button" ng-click="newQuestionShow=true">Create new Question</button><br><br>
 			<div class="new-question" ng-show="newQuestionShow">
 				<form name="newQues" >
-					<h3>Create New Question</h3>
+				<div class="panel panel-default">
+					<div class="panel-heading"><h3 ng-hide="isEditQues">Create New Question</h3>
+					<h3 ng-show="isEditQues">Edit Question</h3>
+					</div><br>
+					<div class="panel-body">
 					<p><label>QID: </label><input type="text" ng-model="qid" name="qid" size="4" ng-disabled="true"></p>
-					<label>Question:</label><br>
-					<textarea ng-model="question" rows="3" cols="70" name="question" placeholder="Type question here..." required></textarea><br>
-					<p><label>Answer Type:</label> <label><input type="radio" ng-model="answerType" name="answerType" value="radio" ng-click="selectAnswerType(answerType)">Single Punch</label>
+					<label>Question: </label><span style="color: red" ng-show="newQues.question.$touched && newQues.question.$invalid">*Question is required.</span><br>
+					<textarea ng-model="question" rows="3" cols="70" name="question" placeholder="Type question here..." required></textarea>
+					<br><br>
+					<p><label>Question Type:</label> <input type="radio" ng-model="questionType" name="questionType" value="Singlepunch" ng-click="selectQuestionType(questionType)">Single Punch
 
-					<label><input type="radio" ng-model="answerType" name="answerType" value="checkbox" ng-click="selectAnswerType(answerType)">Multi Punch</label></p>
+					<input type="radio" ng-model="questionType" name="questionType" value="Multipunch" ng-click="selectQuestionType(questionType)">Multi Punch</p>
 
-					<div ng-hide="edit"><input type="text" ng-model="answer" name="answer" placeholder="Type answer here..." required>
+					<div><input type="text" ng-model="answer" name="answer" placeholder="Type answer here..." required>
 					<button type="button" ng-click="addAnswer()" ng-disabled="newQues.answer.$invalid">Add Answer</button></div>
 
-					<div ng-show="edit"><input type="text" ng-model="answer" name="answer" placeholder="Update answer here..." required>
-					<button type="button" ng-click="update()" ng-disabled="newQues.answer.$invalid">Update</button>
-					<button type="button" ng-click="edit=false;answer=''" >Cancel</button>
-					</div><br>
-					<div ng-show="errorAnsShow">{{errorSameAnswer}}</div><br>
+					<br>
+					<div style="color:red" ng-show="errorAnsShow">{{errorSameAnswer}}</div><br>
 
 
-					<label ng-hide="answerList.length==0">Answer(s):</label><br>
-					<table class="tb-answer" border="1" ng-hide="answerList.length==0">
+					<label ng-hide="answerList.length==0">Answer(s):</label> <span style="color:red" ng-show="answerList.length==1">*Add atleast 2 answers</span><br>
+					<div class="table-responsive">
+					<table class="tb-answer table  w3-table w3-striped w3-centered"  ng-hide="answerList.length==0">
+					<thead class="tb-head">
 						<tr>
 							<th>Ans ID</th>
 							<th>Answer</th>
@@ -46,26 +54,56 @@
 							<th>Delete?</th>
 							<th>Result</th>
 						</tr>
+					</thead>
+					<tbody>
 						<tr ng-repeat="ans in answerList">
+
 							<td>{{$index+1}}</td>
-							<td>{{ans.answer}}</td>
-							<td><button type="button" ng-click="editAns($index)">Edit</button></td>
-							<td><button  type="button" ng-disabled="edit" ng-click=deleteAns($index)>Delete</button></td>
-							<td ng-show="resultType"><input type="radio" ng-model="$parent.result" name="result" ng-value="{{$index+1}}" required></td>
-							<td ng-hide="resultType"><input type="checkbox" name="result1" ng-model="ans.res"></td>
+
+							<td>
+								<span ng-hide="editable($index)">{{ans.answer}}</span>
+								<span ng-show="editable($index)"><input type="text" ng-model="ans.answer" name="answerIndex" placeholder="Update answer here..." required></span>
+							</td>
+
+							<td>
+								<span ng-hide="editable($index)"><button type="button" ng-click="editAns($index)">Edit</button></span>
+								<span ng-show="editable($index)"><button type="button" ng-click="update($index,ans.answer)" ng-disabled="newQues.answerIndex.$invalid" >Update</button></span>
+							</td>
+
+							<td>
+								<button  type="button" ng-disabled="editable($index)" ng-click=deleteAns($index)>Delete</button>
+							</td>
+
+							<td ng-show="resultType">
+								<input type="radio" ng-model="$parent.result" name="result" value="{{$index+1}}" required>
+							</td>
+
+							<td ng-hide="resultType">
+								<input type="checkbox" name="result1" ng-model="ans.res">
+							</td>
 						</tr>
-					</table><br>
+					</tbody>
+					</table>
+
+					<br>
+					<span style="color:red" ng-hide="result!=null || checkedResultAnswer().length>0" ng-show="errorResultShow">{{errorResult}}</span>
+						
+					</div><br>
 			
 					<button type="button" ng-click="reset()">Cancel</button>
-					<button type="button" ng-click="addQuestion()" ng-disabled="newQues.question.$invalid || answerList.length<2 || (newQues.result.$invalid && checkedResultAnswer()<1)">Create</button>
-					
-					
-					
+					<button type="button" ng-hide="isEditQues" ng-click="addQuestion()" ng-disabled="newQues.question.$invalid || answerList.length<2">Create</button>
+					<button ng-show="isEditQues" ng-disabled="newQues.question.$invalid || answerList.length<2" ng-click="updateQuestion(qid)" type="button">Update Question</button>
+					</div>
+					</div>
 				</form>
+			</div><br>
+			<div>
+			
 
-			</div>
-			<p>{{questionList|json}}</p>
-			<table border="1" ng-hide="questionList.length==0">
+			<h2 ng-hide="questionList.length==0">Questions:</h2>
+			<div class="table-responsive">
+			<table class="tb-question table w3-table w3-striped w3-centered w3-border" ng-hide="questionList.length==0">
+			<thead class="tb-head">
 				<tr>
 					<th>QID</th>
 					<th>Question</th>
@@ -75,20 +113,23 @@
 					<th>Editable?</th>
 					<th>Delete?</th>
 				</tr>
+			</thead>
+			<tbody>
 				<tr ng-repeat="qList in questionList">
 					<td>{{qList.qid}}</td>
 					<td>{{qList.question}}</td>
-					<td>{{qList.answerType}}</td>
+					<td>{{qList.questionType}}</td>
 					<td>
-						<ul>
-							<li ng-repeat="ans in qList.answers">{{ans.answer}}</li>
-						</ul>
+							<span ng-repeat="ans in qList.answers">{{ans.answer}}, </span>
 					</td>
 					<td>{{getResult(qList.resultR,qList.resultC)}}</td>
-					<td></td>
-					<td></td>
+					<td><button type="button" ng-click="editQues(qList)">Edit</button></td>
+					<td><button type="button" ng-click="deleteQues($index)">Delete</button></td>
 				</tr>
+			</tbody>
 			</table>
+			</div>
+			</div>
 		</div>
 	
 </div>

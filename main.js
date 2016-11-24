@@ -1,17 +1,22 @@
 var app=angular.module('quizApp',[]);
 app.controller('controlQuiz',['$scope',function($scope){
 	/*------------------Initialize variables---------------*/
-	var tempUpdateAns=0;
-	$scope.qid=1;
+	$scope.countQid=1;
+	$scope.qid=$scope.countQid;
 	$scope.newQuestionShow=false;
 	$scope.edit=false;
-	$scope.answerType='radio';
+	$scope.questionType='Singlepunch';
 	$scope.resultType=true;
 	$scope.errorAnsShow=false;
 	$scope.errorSameAnswer='';
+	$scope.errorResult='';
+	$scope.errorResultShow=false;
 	$scope.answerList=[];
 	$scope.questionList=[];
 	$scope.result=$scope.answerList[0];
+	$scope.selectedAns=undefined;
+	$scope.isEditQues=false;
+	$scope.editQuesObject={};
 
 
 	/*------------------Function that adds the answer into answerList--------------*/
@@ -32,48 +37,32 @@ app.controller('controlQuiz',['$scope',function($scope){
 			});
 		}else{
 			$scope.errorAnsShow=true;
-			$scope.errorSameAnswer="Answer is already in answer(s) list.";
+			$scope.errorSameAnswer="*Answer is already in answer(s) list.";
 		}
 		$scope.answer='';
 	};
 
 	/*-------------------Function that takes the answer for edit----------------*/
 	$scope.editAns=function(index){
-		$scope.edit=true;
-		$scope.answer=$scope.answerList[index].answer;
-		setEditableAns(index); //call function for set the updating value into temp variable
-
+		$scope.selectedAns=index;
 	};
-	/*-----------------Accessor for updating answer value----------------*/
-	function setEditableAns(index){
-		tempUpdateAns=index;
-	}
-	function getEditableAns(){
-		return tempUpdateAns;
-	}
-
+	
 	/*-----------------Updating the answer into answer list-------------*/
-	$scope.update=function(){
+	$scope.update=function(index,ansr){
 		var answerCount=0;
+		$scope.answerList[index].answer=ansr;
 		angular.forEach($scope.answerList,function(ans,index){
-			if(ans.answer===$scope.answer){
+			if(ans.answer===ansr){
 				answerCount++;
 			}
 		});
-		if(answerCount==0){
+		 if(answerCount==1){
 			$scope.errorAnsShow=false;
-			$scope.answerList[getEditableAns()].answer=$scope.answer;
-			$scope.edit=false;
-			
-		}else if(answerCount==1 && $scope.answerList[getEditableAns()].answer===$scope.answer){
-			$scope.errorAnsShow=false;
-			$scope.edit=false;
-			
+			$scope.selectedAns=undefined;
 		}else{
 			$scope.errorAnsShow=true;
-			$scope.errorSameAnswer="Answer is already in answer(s) list.";
+			$scope.errorSameAnswer="*Answer is already in answer(s) list.";
 		}
-			$scope.answer='';
 	}
 
 	/*--------------------function that delete the answer into answer list-----------------*/
@@ -85,8 +74,8 @@ app.controller('controlQuiz',['$scope',function($scope){
 
 	
 	/*---------------------Check the answer type to set the result with single or multi-------------*/
-	$scope.selectAnswerType=function(answerTypeValue){
-		if(answerTypeValue==='radio'){
+	$scope.selectQuestionType=function(questionTypeValue){
+		if(questionTypeValue==='Singlepunch'){
 			$scope.resultType=true;
 			angular.forEach($scope.answerList,function(ans,index){
 				ans.res=false;
@@ -110,27 +99,38 @@ app.controller('controlQuiz',['$scope',function($scope){
 
 /*------------------Function that add questions into JSON format-------------------*/
 $scope.addQuestion=function(){
-
-	$scope.questionList.push({
-		qid:$scope.qid,
-		question:$scope.question,
-		answerType:$scope.answerType,
-		answers:$scope.answerList,
-		resultR:$scope.result,
-		resultC:$scope.checkedResultAnswer()
-	});
-	$scope.qid++;
-	$scope.reset();
+	if($scope.result!=null || $scope.checkedResultAnswer().length>0){
+		$scope.questionList.push({
+			qid:$scope.qid,
+			question:$scope.question,
+			questionType:$scope.questionType,
+			answers:$scope.answerList,
+			resultR:$scope.result,
+			resultC:$scope.checkedResultAnswer()
+		});
+		$scope.qid=$scope.countQid++;
+		$scope.reset();
+	}else{
+		$scope.errorResultShow=true;
+		$scope.errorResult='*Must select result';
+	}
+	
 }
 
+/*-------------------------Function that reset all variables------------------*/
 $scope.reset=function(){
 	$scope.newQuestionShow=false;
+	$scope.isEditQues=false;
+	$scope.qid=$scope.countQid;
 	$scope.question='';
-	$scope.answerType='radio';
+	$scope.questionType='Singlepunch';
 	$scope.resultType=true;
 	$scope.answerList=[];
 	$scope.result=null;
-
+	$scope.editQuesObject={};
+	$scope.errorSameAnswer='';
+	$scope.errorResult='';
+	$scope.errorResultShow=false;
 }
 
 $scope.getResult=function(resultR,resultC){
@@ -141,4 +141,62 @@ $scope.getResult=function(resultR,resultC){
 	}
 }
 
+/*--------------------Check whether the edit answer will show or not-----------------*/
+$scope.editable=function(index){
+	if(index===$scope.selectedAns){
+		return true;
+	}
+	else{
+		false;
+	}
+}
+
+/*---------------------------Delete the question from question list-------------------*/
+
+$scope.deleteQues=function(index){
+	$scope.questionList.splice(index,1);
+}
+
+/*-------------------------Edit question from the question list---------------------*/
+
+$scope.editQues=function(obj){
+	$scope.isEditQues=true;
+	$scope.newQuestionShow=true;
+	$scope.editQuesObject=obj;
+	$scope.qid=obj.qid;
+	$scope.question=obj.question;
+	$scope.questionType=obj.questionType;
+	$scope.answerList=angular.copy(obj.answers);
+	if(obj.resultR===null){
+		angular.forEach(obj.answers,function(ans,index){
+			$scope.answerList[index].res=ans.res;
+		});
+		$scope.resultType=false;
+		$scope.result=null;
+	}else{
+		$scope.result=obj.resultR;
+		$scope.resultType=true;
+	}
+
+}
+
+/*------------------------Update question according to qid-----------------------*/
+
+$scope.updateQuestion=function(id){
+	if($scope.result!=null || $scope.checkedResultAnswer().length>0 ){
+		if($scope.editQuesObject.qid===id){
+		$scope.editQuesObject.question=$scope.question;
+		$scope.editQuesObject.questionType=$scope.questionType;
+		$scope.editQuesObject.answers=$scope.answerList;
+		$scope.editQuesObject.resultR=$scope.result;
+		$scope.editQuesObject.resultC=$scope.checkedResultAnswer();
+	}
+	$scope.reset();
+	}
+	else{
+		$scope.errorResultShow=true;
+		$scope.errorResult='*Must select result';
+	}
+	
+}
 }]);
