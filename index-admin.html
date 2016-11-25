@@ -5,6 +5,7 @@
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.6/angular.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/ngStorage/0.3.6/ngStorage.min.js"></script>
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
 	<link rel="stylesheet" href="http://www.w3schools.com/lib/w3.css">
@@ -61,17 +62,17 @@
 							<td>{{$index+1}}</td>
 
 							<td>
-								<span ng-hide="editable($index)">{{ans.answer}}</span>
-								<span ng-show="editable($index)"><input type="text" ng-model="ans.answer" name="answerIndex" placeholder="Update answer here..." required></span>
+								<span ng-hide="ans.editAnsClick">{{ans.answer}}</span>
+								<span ng-show="ans.editAnsClick"><input type="text" ng-model="ans.answer" name="answerIndex" placeholder="Update answer here..." required></span>
 							</td>
 
 							<td>
-								<span ng-hide="editable($index)"><button type="button" ng-click="editAns($index)">Edit</button></span>
-								<span ng-show="editable($index)"><button type="button" ng-click="update($index,ans.answer)" ng-disabled="newQues.answerIndex.$invalid" >Update</button></span>
+								<span ng-hide="ans.editAnsClick"><button type="button" ng-click="editAns($index)">Edit</button></span>
+								<span ng-show="ans.editAnsClick"><button type="button" ng-click="update($index,ans.answer)" ng-disabled="ans.answer==null" >Update</button></span>
 							</td>
 
 							<td>
-								<button  type="button" ng-disabled="editable($index)" ng-click=deleteAns($index)>Delete</button>
+								<button  type="button" ng-disabled="ans.editAnsClick" ng-click=deleteAns($index)>Delete</button>
 							</td>
 
 							<td ng-show="resultType">
@@ -87,6 +88,7 @@
 
 					<br>
 					<span style="color:red" ng-hide="result!=null || checkedResultAnswer().length>0" ng-show="errorResultShow">{{errorResult}}</span>
+					<span style="color:red" ng-show="errorNotEmptyShow">{{errorNotEmpty}}</span>
 						
 					</div><br>
 			
@@ -124,7 +126,7 @@
 					</td>
 					<td>{{getResult(qList.resultR,qList.resultC)}}</td>
 					<td><button type="button" ng-click="editQues(qList)">Edit</button></td>
-					<td><button type="button" ng-click="deleteQues($index)">Delete</button></td>
+					<td><button type="button" ng-disabled="disableDelete(qList)" ng-click="deleteQues($index)">Delete</button></td>
 				</tr>
 			</tbody>
 			</table>
