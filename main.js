@@ -1,8 +1,12 @@
-var app=angular.module('quizApp',[]);
-app.controller('controlQuiz',['$scope',function($scope){
+var app=angular.module('quizApp',['ngStorage']);
+app.controller('controlQuiz',['$scope','$localStorage','$sessionStorage',function($scope,$localStorage,$sessionStorage){
 	/*------------------Initialize variables---------------*/
-	$scope.countQid=1;
-	$scope.qid=$scope.countQid;
+	$scope.$storage=$localStorage.$default({
+		countQid:1,
+		questionList:[]
+	});
+	
+	$scope.qid=$localStorage.countQid;
 	$scope.newQuestionShow=false;
 	$scope.edit=false;
 	$scope.questionType='Singlepunch';
@@ -17,6 +21,8 @@ app.controller('controlQuiz',['$scope',function($scope){
 	$scope.selectedAns=undefined;
 	$scope.isEditQues=false;
 	$scope.editQuesObject={};
+	$scope.errorNotEmptyShow=false;
+	$scope.errorNotEmpty='';
 
 
 	/*------------------Function that adds the answer into answerList--------------*/
@@ -34,6 +40,7 @@ app.controller('controlQuiz',['$scope',function($scope){
 			{ 
 				answer: $scope.answer,
 				res:false,
+				editAnsClick:false
 			});
 		}else{
 			$scope.errorAnsShow=true;
@@ -45,24 +52,30 @@ app.controller('controlQuiz',['$scope',function($scope){
 	/*-------------------Function that takes the answer for edit----------------*/
 	$scope.editAns=function(index){
 		$scope.selectedAns=index;
+		$scope.answerList[index].editAnsClick=true;
 	};
 	
 	/*-----------------Updating the answer into answer list-------------*/
 	$scope.update=function(index,ansr){
 		var answerCount=0;
-		$scope.answerList[index].answer=ansr;
-		angular.forEach($scope.answerList,function(ans,index){
-			if(ans.answer===ansr){
-				answerCount++;
+			$scope.answerList[index].answer=ansr;
+			
+			angular.forEach($scope.answerList,function(ans,index){
+				if(ans.answer===ansr){
+					answerCount++;
+				}
+			});
+			if(answerCount==1){
+				$scope.errorAnsShow=false;
+				$scope.answerList[index].editAnsClick=false;
+				$scope.selectedAns=undefined;
+			}else{
+				$scope.errorAnsShow=true;
+				$scope.answerList[index].editAnsClick=true;
+				$scope.errorSameAnswer="*Answer is already in answer(s) list.";
 			}
-		});
-		 if(answerCount==1){
-			$scope.errorAnsShow=false;
-			$scope.selectedAns=undefined;
-		}else{
-			$scope.errorAnsShow=true;
-			$scope.errorSameAnswer="*Answer is already in answer(s) list.";
-		}
+		
+		
 	}
 
 	/*--------------------function that delete the answer into answer list-----------------*/
@@ -99,7 +112,16 @@ app.controller('controlQuiz',['$scope',function($scope){
 
 /*------------------Function that add questions into JSON format-------------------*/
 $scope.addQuestion=function(){
-	if($scope.result!=null || $scope.checkedResultAnswer().length>0){
+	var ansValue=$scope.answerList.filter(function(ans,index){
+		if(ans.answer==null){
+			return ans;
+		}
+	});
+	if(ansValue.length>0){
+		$scope.errorNotEmptyShow=true;
+		$scope.errorNotEmpty='*Answer List should not be empty';
+	}
+	else if($scope.result!=null || $scope.checkedResultAnswer().length>0){
 		$scope.questionList.push({
 			qid:$scope.qid,
 			question:$scope.question,
@@ -108,11 +130,14 @@ $scope.addQuestion=function(){
 			resultR:$scope.result,
 			resultC:$scope.checkedResultAnswer()
 		});
-		$scope.qid=$scope.countQid++;
+		
+		$scope.qid=$localStorage.countQid++;
+		$localStorage.questionList=$scope.questionList;
 		$scope.reset();
 	}else{
 		$scope.errorResultShow=true;
 		$scope.errorResult='*Must select result';
+		$scope.errorNotEmptyShow=false;
 	}
 	
 }
@@ -121,7 +146,7 @@ $scope.addQuestion=function(){
 $scope.reset=function(){
 	$scope.newQuestionShow=false;
 	$scope.isEditQues=false;
-	$scope.qid=$scope.countQid;
+	$scope.qid=$localStorage.countQid;
 	$scope.question='';
 	$scope.questionType='Singlepunch';
 	$scope.resultType=true;
@@ -131,6 +156,8 @@ $scope.reset=function(){
 	$scope.errorSameAnswer='';
 	$scope.errorResult='';
 	$scope.errorResultShow=false;
+	$scope.errorNotEmptyShow=false;
+	$scope.errorNotEmpty='';
 }
 
 $scope.getResult=function(resultR,resultC){
@@ -138,16 +165,6 @@ $scope.getResult=function(resultR,resultC){
 		return resultC;
 	}else{
 		return resultR;
-	}
-}
-
-/*--------------------Check whether the edit answer will show or not-----------------*/
-$scope.editable=function(index){
-	if(index===$scope.selectedAns){
-		return true;
-	}
-	else{
-		false;
 	}
 }
 
@@ -183,7 +200,16 @@ $scope.editQues=function(obj){
 /*------------------------Update question according to qid-----------------------*/
 
 $scope.updateQuestion=function(id){
-	if($scope.result!=null || $scope.checkedResultAnswer().length>0 ){
+	var ansValue=$scope.answerList.filter(function(ans,index){
+		if(ans.answer==null){
+			return ans;
+		}
+	});
+	if(ansValue.length>0){
+		$scope.errorNotEmptyShow=true;
+		$scope.errorNotEmpty='*Answer List should not be empty';
+	}
+	else if($scope.result!=null || $scope.checkedResultAnswer().length>0 ){
 		if($scope.editQuesObject.qid===id){
 		$scope.editQuesObject.question=$scope.question;
 		$scope.editQuesObject.questionType=$scope.questionType;
@@ -195,8 +221,17 @@ $scope.updateQuestion=function(id){
 	}
 	else{
 		$scope.errorResultShow=true;
+		$scope.errorNotEmptyShow=false;
 		$scope.errorResult='*Must select result';
+	}	
+}
+
+/*------------------------Disable delete button while updating the question--------------*/
+$scope.disableDelete=function(obj){
+	if($scope.editQuesObject.qid===obj.qid){
+		return true;
+	}else{
+		return false;
 	}
-	
 }
 }]);
