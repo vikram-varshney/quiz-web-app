@@ -7,7 +7,6 @@ header{
   text-decoration: block;
   box-shadow: 0 12px 12px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19);
   margin-bottom: 10px;
-
 }
 .oq-heading{
   color: white;
@@ -35,7 +34,8 @@ header{
 	text-decoration:block;
 	display: inline-block;
 	font-size: 16px;
-	margin: 10px 15px;
+	position: relative;
+	margin: 100px 10px 15px 10px;
 	cursor: pointer;
   	display: inline;
 	-webkit-transition-duration: 0.4s; /* Safari */
@@ -51,6 +51,10 @@ header{
 	background-color: #009688;
 	color: white;
 }
+textarea {max-width:100%;}
+
+
+
 
 
 
