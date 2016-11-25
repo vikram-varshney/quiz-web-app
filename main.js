@@ -122,7 +122,7 @@ $scope.addQuestion=function(){
 		$scope.errorNotEmpty='*Answer List should not be empty';
 	}
 	else if($scope.result!=null || $scope.checkedResultAnswer().length>0){
-		$scope.questionList.push({
+		$localStorage.questionList.push({
 			qid:$scope.qid,
 			question:$scope.question,
 			questionType:$scope.questionType,
@@ -132,7 +132,6 @@ $scope.addQuestion=function(){
 		});
 		
 		$scope.qid=$localStorage.countQid++;
-		$localStorage.questionList=$scope.questionList;
 		$scope.reset();
 	}else{
 		$scope.errorResultShow=true;
@@ -171,7 +170,7 @@ $scope.getResult=function(resultR,resultC){
 /*---------------------------Delete the question from question list-------------------*/
 
 $scope.deleteQues=function(index){
-	$scope.questionList.splice(index,1);
+	$localStorage.questionList.splice(index,1);
 }
 
 /*-------------------------Edit question from the question list---------------------*/
