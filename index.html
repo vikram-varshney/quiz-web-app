@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Online Quiz</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.6/angular.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/ngStorage/0.3.6/ngStorage.min.js"></script>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+		
+		<link rel="stylesheet" href="http://www.w3schools.com/lib/w3.css">
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+		<link rel="stylesheet" href="style.css">	
+		<script src="main.js"></script>
+	</head>
+	<body ng-app="quizApp" ng-controller="controlUser">
+		<div class="container">
+			<div class="header">
+				<header>
+					<h2 class="oq-heading">Online Quiz</h2>
+				</header>
+			</div>
+			<div ng-hide="isScore">
+			<div class="panel panel-default">
+
+				<div class="panel-heading"><h3>Question: #{{index+1}} </h3></div>
+				<div class="viewPage">
+					<p>{{quesData[index].question}}</p><br>
+				<label>Answer:</label>
+				<div ng-repeat="ans in quesData[index].answers" ng-show="checkQuestionType(quesData[index].questionType)">
+					<input type="radio" ng-model="userAnswer[index].resultR" name="radioAns" value="{{$index+1}}"> {{ans.answer}}
+
+				</div>
+				<div ng-repeat="ans in quesData[index].answers" ng-hide="checkQuestionType(quesData[index].questionType)">
+					<input type="checkbox" ng-model="userAnswer[index].answers[$index].res" name="ans.answer" value="ans.answer"> {{ans.answer}}
+				</div>
+				</div>
+				
+			</div>
+
+
+    		<ul class="pager">
+    			<li ng-hide="index==0" ng-click="previous(index)"><a href="#">&#10094; Previous</a></li>
+    			<li ng-hide="index==quesData.length-1" ng-click="next(index)"><a href="#">Next &#10095;</a></li>
+    			<li ng-show="index==quesData.length-1" ng-click=calculateScore()><a href="#">Submit</a></li>
+  			</ul>
+  			<!-- <p>{{userAnswer|json}}</p> -->
+  			</div>
+  			<div class="score panel panel-default" ng-show="isScore">
+  				<div class="score-heading panel-heading"><h3>{{scoreMessage}}</h3></div>
+  				<div class="score-data">
+  					<h2>Score: {{scoreCounter}}/{{quesData.length}}</h2><br><br>
+  					<!-- <div class="table-responsive">
+  					<table class="tb-question table w3-table w3-striped w3-centered w3-border">
+  					<thead>
+  						<tr>
+  							<th>QID</th>
+  							<th ng-repeat="id in quesData">QID {{id.qid}}</th>
+  						</tr>
+  					</thead>
+  					<tbody>
+  						<tr>
+  							<th>Your Answers</th>
+  							<td ng-repeat="id in userAnswer">{{showUserAns(id)}}</td>
+  						</tr>
+  						<tr>
+  							<th>Correct Answers</th>
+  							<td ng-repeat="id in quesData">{{id.resultR}}</td>
+  						</tr>
+  					</tbody>
+  					</table>
+  					</div> -->
+  				</div>
+  				
+  			</div>
+  			
+
+  			<div class="footer" ng-hide="isScore">
+				<footer>
+					<strong>Note:</strong> Don't be refresh while you giving answers.
+				</footer>
+			</div>
+		</div>
+
+
+	</body>
+</html>

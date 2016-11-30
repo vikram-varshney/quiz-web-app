@@ -53,6 +53,36 @@ header{
 }
 textarea {max-width:100%;}
 
+.question-hide {
+    left: -100px !important;
+    opacity: 0 !important;
+}
+
+.viewPage{
+	padding: 15px;
+}
+
+.score{
+	align:center;
+    width:80%;
+    margin:auto;
+    box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19);
+}
+.score-heading {
+	text-align: center;
+}
+
+.panel{
+	margin-top:80px;
+}
+.score-data{
+	text-align:center;
+	margin:100px auto;
+}
+
+
+
+
 
 
 

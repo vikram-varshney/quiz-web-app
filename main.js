@@ -1,4 +1,6 @@
 var app=angular.module('quizApp',['ngStorage']);
+
+/*------------------------Controller for Admin--------------------------------*/
 app.controller('controlQuiz',['$scope','$localStorage','$sessionStorage',function($scope,$localStorage,$sessionStorage){
 	/*------------------Initialize variables---------------*/
 	$scope.$storage=$localStorage.$default({
@@ -16,7 +18,7 @@ app.controller('controlQuiz',['$scope','$localStorage','$sessionStorage',functio
 	$scope.errorResult='';
 	$scope.errorResultShow=false;
 	$scope.answerList=[];
-	$scope.questionList=[];
+	//$scope.questionList=[];
 	$scope.result=$scope.answerList[0];
 	$scope.selectedAns=undefined;
 	$scope.isEditQues=false;
@@ -106,12 +108,12 @@ app.controller('controlQuiz',['$scope','$localStorage','$sessionStorage',functio
 			if(ans.res){
 				resultList.push(index+1);
 			}
-	})
+	});
 	return resultList;
-}
+	}
 
-/*------------------Function that add questions into JSON format-------------------*/
-$scope.addQuestion=function(){
+	/*------------------Function that add questions into JSON format-------------------*/
+	$scope.addQuestion=function(){
 	var ansValue=$scope.answerList.filter(function(ans,index){
 		if(ans.answer==null){
 			return ans;
@@ -139,10 +141,10 @@ $scope.addQuestion=function(){
 		$scope.errorNotEmptyShow=false;
 	}
 	
-}
+	}
 
-/*-------------------------Function that reset all variables------------------*/
-$scope.reset=function(){
+	/*-------------------------Function that reset all variables------------------*/
+	$scope.reset=function(){
 	$scope.newQuestionShow=false;
 	$scope.isEditQues=false;
 	$scope.qid=$localStorage.countQid;
@@ -157,25 +159,25 @@ $scope.reset=function(){
 	$scope.errorResultShow=false;
 	$scope.errorNotEmptyShow=false;
 	$scope.errorNotEmpty='';
-}
+	}
 
-$scope.getResult=function(resultR,resultC){
+	$scope.getResult=function(resultR,resultC){
 	if(resultR===null){
 		return resultC;
 	}else{
 		return resultR;
 	}
-}
+	}
 
-/*---------------------------Delete the question from question list-------------------*/
+	/*---------------------------Delete the question from question list-------------------*/
 
-$scope.deleteQues=function(index){
-	$localStorage.questionList.splice(index,1);
-}
+	$scope.deleteQues=function(index){
+		$localStorage.questionList.splice(index,1);
+	}
 
-/*-------------------------Edit question from the question list---------------------*/
+	/*-------------------------Edit question from the question list---------------------*/
 
-$scope.editQues=function(obj){
+	$scope.editQues=function(obj){
 	$scope.isEditQues=true;
 	$scope.newQuestionShow=true;
 	$scope.editQuesObject=obj;
@@ -194,11 +196,11 @@ $scope.editQues=function(obj){
 		$scope.resultType=true;
 	}
 
-}
+	}
 
-/*------------------------Update question according to qid-----------------------*/
+	/*------------------------Update question according to qid-----------------------*/
 
-$scope.updateQuestion=function(id){
+	$scope.updateQuestion=function(id){
 	var ansValue=$scope.answerList.filter(function(ans,index){
 		if(ans.answer==null){
 			return ans;
@@ -223,14 +225,123 @@ $scope.updateQuestion=function(id){
 		$scope.errorNotEmptyShow=false;
 		$scope.errorResult='*Must select result';
 	}	
-}
+	}
 
-/*------------------------Disable delete button while updating the question--------------*/
-$scope.disableDelete=function(obj){
+	/*------------------------Disable delete button while updating the question--------------*/
+	$scope.disableDelete=function(obj){
 	if($scope.editQuesObject.qid===obj.qid){
 		return true;
 	}else{
 		return false;
 	}
-}
+	}
 }]);
+
+
+/*-----------------------------Controller for User View-----------------------------*/
+/*
+ * Created by @Vikram on Monday, 28 November 2016 10:30 AM
+ * Control the user view quiz 
+ */
+
+ app.controller('controlUser',['$scope','$localStorage',function($scope,$localStorage){
+ 	/*-------------------------Initialize variables----------------------------*/
+
+ 	$scope.quesData=$localStorage.questionList;	//copy the questionList into local variable quesData
+ 	$scope.index=0;
+ 	$scope.scoreCounter=0;
+ 	$scope.isScore=false;
+ 	$scope.scoreMessage='';
+ 	$scope.userAnswer=[];
+
+ 	/*--------Making the array of objects that binds the user answers---------*/
+ 	angular.forEach($scope.quesData,function(ques,index){
+ 		var tempAnswers=[];
+ 		angular.forEach(ques.answers,function(ans,ind){
+ 				tempAnswers[ind]={
+ 					answer:ans.answer,
+ 					res:false
+ 				}
+ 			});
+ 		$scope.userAnswer[index]={
+ 			qid:ques.qid,
+ 			answers: tempAnswers ,
+ 			resultR:0
+ 		};
+ 	});
+
+ 	/*---------------Function that check the question type--------------*/
+ 	$scope.checkQuestionType=function(qType){
+ 		if(qType==='Singlepunch'){
+ 			return true;
+ 		}else{
+ 			return false;
+ 		}
+ 	}
+
+ 	/*-------------------Previous click logic to reduce the index value by 1--------------*/
+ 	$scope.previous=function(index){
+ 		$scope.index = index > 0 ? index-1 : 0;
+
+ 	}
+
+ 	/*--------------------Next click logic to add the index value by 1------------------*/
+ 	$scope.next=function(index){
+ 		$scope.index = index < $scope.quesData.length-1 ? index + 1 : $scope.quesData.length-1;
+ 	}
+
+ 	/*------------------Function that calculate the score according to user answers----------*/
+ 	$scope.calculateScore=function(){
+ 		
+ 		angular.forEach($scope.quesData,function(ques,index){
+ 			if(ques.resultR!=null && ques.questionType==='Singlepunch'){
+ 				if(ques.qid===$scope.userAnswer[index].qid && ques.resultR===$scope.userAnswer[index].resultR){
+ 					$scope.scoreCounter++;
+ 				}
+ 			}
+ 			if(ques.questionType==='Multipunch'){
+ 				var tempCounter=0;
+ 				angular.forEach(ques.answers,function(ans,ind){
+ 					if (ans.res===$scope.userAnswer[index].answers[ind].res)
+ 					{
+ 						tempCounter++;
+ 					}
+ 				});		
+ 				if(tempCounter===ques.answers.length){
+ 					$scope.scoreCounter++;
+ 				}
+ 			}
+
+ 		});
+ 		$scope.isScore=true;
+	 	if($scope.scoreCounter>=0 && $scope.scoreCounter<($scope.quesData.length/2)){
+	 		$scope.scoreMessage='You need to do work hard!';
+	 	}else if($scope.scoreCounter>=($scope.quesData.length/2) && $scope.scoreCounter<($scope.quesData.length*0.9)){
+	 		$scope.scoreMessage='Well done!';
+	 	}else if($scope.scoreCounter>=($scope.quesData.length*0.9) && $scope.scoreCounter==$scope.quesData.length){
+	 		$scope.scoreMessage='Excellent!';
+ 		}
+ 	}
+ 	
+ 	$scope.showUserAns=function(id){
+ 		var arr=[];
+ 			arr=id.answers.filter(function(ans,ind){
+ 				if(ans.res){
+ 					return ans;
+ 				}
+ 			});
+ 			if(id.resultR==0 && arr.length==0){
+ 				return ;
+ 			}
+ 		else if(id.resultR==0 && arr.length>0){
+ 			var temp=[];
+ 			angular.forEach(arr,function(ans,ind){
+ 				temp.push(ans.answer);
+ 			});
+ 			return temp.join('|');
+ 		}else{
+
+ 			return id.resultR;
+ 		}
+ 	}
+ }]);
