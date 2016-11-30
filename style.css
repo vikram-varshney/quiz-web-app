@@ -42,7 +42,7 @@ header{
 	transition-duration: 0.4s;
 }
 
-.bt-create-ques:hover{
+.bt-create-ques:hover {
 	background-color: #009688;
     color: white;
     box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19);
@@ -80,6 +80,24 @@ textarea {max-width:100%;}
 	margin:100px auto;
 }
 
+.pager li > a{
+	background-color: white;
+    border:1px solid #009688;
+     border-radius: 25px;
+    color: black;
+    padding: 5px 10px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    cursor: pointer;
+    -webkit-transition-duration: 0.4s; /* Safari */
+	transition-duration: 0.4s;
+}
+.pager li >a:hover, a:active {
+	background-color: #009688;
+    color: white;
+    box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19);
+}
 
 
 

@@ -145,20 +145,20 @@ app.controller('controlQuiz',['$scope','$localStorage','$sessionStorage',functio
 
 	/*-------------------------Function that reset all variables------------------*/
 	$scope.reset=function(){
-	$scope.newQuestionShow=false;
-	$scope.isEditQues=false;
-	$scope.qid=$localStorage.countQid;
-	$scope.question='';
-	$scope.questionType='Singlepunch';
-	$scope.resultType=true;
-	$scope.answerList=[];
-	$scope.result=null;
-	$scope.editQuesObject={};
-	$scope.errorSameAnswer='';
-	$scope.errorResult='';
-	$scope.errorResultShow=false;
-	$scope.errorNotEmptyShow=false;
-	$scope.errorNotEmpty='';
+		$scope.newQuestionShow=false;
+		$scope.isEditQues=false;
+		$scope.qid=$localStorage.countQid;
+		$scope.question='';
+		$scope.questionType='Singlepunch';
+		$scope.resultType=true;
+		$scope.answerList=[];
+		$scope.result=null;
+		$scope.editQuesObject={};
+		$scope.errorSameAnswer='';
+		$scope.errorResult='';
+		$scope.errorResultShow=false;
+		$scope.errorNotEmptyShow=false;
+		$scope.errorNotEmpty='';
 	}
 
 	$scope.getResult=function(resultR,resultC){
@@ -318,7 +318,7 @@ app.controller('controlQuiz',['$scope','$localStorage','$sessionStorage',functio
 	 		$scope.scoreMessage='You need to do work hard!';
 	 	}else if($scope.scoreCounter>=($scope.quesData.length/2) && $scope.scoreCounter<($scope.quesData.length*0.9)){
 	 		$scope.scoreMessage='Well done!';
-	 	}else if($scope.scoreCounter>=($scope.quesData.length*0.9) && $scope.scoreCounter==$scope.quesData.length){
+	 	}else if($scope.scoreCounter>=($scope.quesData.length*0.9) && $scope.scoreCounter<=$scope.quesData.length){
 	 		$scope.scoreMessage='Excellent!';
  		}
  	}

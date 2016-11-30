@@ -41,7 +41,7 @@
 
 
     		<ul class="pager">
-    			<li ng-hide="index==0" ng-click="previous(index)"><a href="#">&#10094; Previous</a></li>
+    			<li ng-hide="index==0" ng-click="previous(index)"><a href="#">&#10094; Prev</a></li>
     			<li ng-hide="index==quesData.length-1" ng-click="next(index)"><a href="#">Next &#10095;</a></li>
     			<li ng-show="index==quesData.length-1" ng-click=calculateScore()><a href="#">Submit</a></li>
   			</ul>
@@ -50,7 +50,7 @@
   			<div class="score panel panel-default" ng-show="isScore">
   				<div class="score-heading panel-heading"><h3>{{scoreMessage}}</h3></div>
   				<div class="score-data">
-  					<h2>Score: {{scoreCounter}}/{{quesData.length}}</h2><br><br>
+  					<h2>Your score is: {{scoreCounter}}/{{quesData.length}}</h2>
   					<!-- <div class="table-responsive">
   					<table class="tb-question table w3-table w3-striped w3-centered w3-border">
   					<thead>
@@ -71,6 +71,9 @@
   					</tbody>
   					</table>
   					</div> -->
+  					<form action="index.html" method="get">
+						<input class="restart-quiz bt-create-ques" type="submit" value="Restart Quiz">
+					</form>
   				</div>
   				
   			</div>
